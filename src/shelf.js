@@ -9,11 +9,12 @@ const generateShelfData = (usecases, specs = []) => {
 			section: group,
 			useCases: usecases
 				.filter((i) => i.tags.group === group)
-				.map((i) =>
-					formatUseCaseDoc(
-						i.usecase.doc(),
+				.map((i) => {
+					const usecaseDoc = !!i.usecase.doc ? i.usecase.doc() : i.usecase().doc()
+					return formatUseCaseDoc(
+						usecaseDoc,
 						specs.find((s) => s.usecase === i.id)
-					)
+					)}
 				)
 		})
 	}
@@ -70,7 +71,7 @@ function renderShelfHTML(project, usecases, entities, description = '', readmePa
 
 function herbsshelf({ herbarium, project, description = '', readmePath = './README.md' }) {
 	const usecases = Array.from(herbarium.usecases.all).map(([_, item]) => ({
-		usecase: item.usecase(),
+		usecase: item.usecase({}).type === 'use case' ? item.usecase({}) : item.usecase({})(),
 		id: item.id,
 		tags: { group: item.group }
 	}))
